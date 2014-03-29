@@ -8,7 +8,7 @@ class Grabator(ircbot.SingleServerIRCBot):
         ircbot.SingleServerIRCBot.__init__(self, [("irc.server.com",6667)], "nickname_to_change", "user_to_change")
     
     def on_welcome(self, serv, ev):
-	serv.join("#barakuun")
+	serv.join("#channel")
 
 if __name__ == "__main__":
     Grabator().start()
