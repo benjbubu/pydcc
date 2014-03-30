@@ -2,6 +2,8 @@
 #
 # CONFIG FILE
 #
+#Modules nécessaires : IrcLib / BeautifulSoup
+#
 # all options and parameters for your implementation of
 # this project are here
 #
