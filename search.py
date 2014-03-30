@@ -4,7 +4,7 @@
 #
 
 import urllib2
-import config as
+import config as CONFIG
         
 def search(requete, url=CONFIG.url):
         url = "http://ixirc.com/?q=%s" % requete.replace(" ","+")
