@@ -15,7 +15,9 @@ choix = input("Quel est votre choix?")
 if choix == 1:
         query = raw_input("Indiquez votre recherche \n")
         html = search.search(query)
-        print(html)
+        resultats = search.parse(html)
+        print(resultats)
+        # print(html)
 else:
         print(choix)
 
