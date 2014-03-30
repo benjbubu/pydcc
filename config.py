@@ -2,7 +2,7 @@
 #
 # CONFIG FILE
 #
-#Modules nécessaires : IrcLib / BeautifulSoup / Python2.X
+#Modules necessaires : IrcLib / BeautifulSoup / Python2.X
 #
 # all options and parameters for your implementation of
 # this project are here
