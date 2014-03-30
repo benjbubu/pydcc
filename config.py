@@ -13,3 +13,5 @@ ircNickName = "REPLACE_ME"
 ircUserName = "REPLACE_ME"
 ircChannel = "REPLACE_ME"
 
+# Search parameters
+url = "http://ixirc.com/?q=%s"
