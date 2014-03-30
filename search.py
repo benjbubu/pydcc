@@ -5,12 +5,13 @@
 
 import urllib2
 import config as CONFIG
+from BeautifulSoup import BeautifulSoup
         
 def search(requete, url=CONFIG.url):
         url = "http://ixirc.com/?q=%s" % requete.replace(" ","+")
         recherche = urllib2.urlopen(url).read()
         #html = recherche.read()
-        return html
+        return url
 
 def parse(html):
         soup = BeautifulSoup(html)
