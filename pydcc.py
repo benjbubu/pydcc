@@ -4,9 +4,8 @@
 #
 
 
-import urllib2
 import config as CONFIG
-import seach
+import search
         
 print "Pydcc"
 print " 1 : Rechercher"
@@ -15,11 +14,8 @@ choix = input("Quel est votre choix?")
 
 if choix == 1:
         query = raw_input("Indiquez votre recherche \n")
-        url = "http://ixirc.com/?q=%s" % query.replace(" ","+")
-        recherche = urllib2.urlopen(url)
-        html = recherche.read()
-        print(url)
-        #print(html)
+        html = search.search(query)
+        print(html)
 else:
         print(choix)
 
