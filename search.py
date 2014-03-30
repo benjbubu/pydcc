@@ -8,7 +8,7 @@ import config as CONFIG
         
 def search(requete, url=CONFIG.url):
         url = "http://ixirc.com/?q=%s" % requete.replace(" ","+")
-        recherche = urllib2.urlopen(url)
-        html = recherche.read()
+        recherche = urllib2.urlopen(url).read()
+        #html = recherche.read()
         return html
 
