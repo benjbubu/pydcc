@@ -18,6 +18,7 @@ def parse(html):
         nbreResultat = 0
         resultats = []
         for ligne in tableResultat.find_all(tr) :
+                resultats[nbreResultats] = liste []
                 for a in ligne.find_all(a):
                         resultats[nbreResultats].append(a.string)
                         # Resultats dans l'ordre 
