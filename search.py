@@ -39,11 +39,30 @@ def searchAndParse(requete, url=CONFIG.url):
                 #        nbreResultat += 1
                 
                 # Version 2
-                table = soup.findAll('a', {'class':'result-dl'})
-                resultats = []
-                for ligne in table :
-                    resultats.append(ligne.get('href'))
-                    print(ligne.get('href'))
+                #table = soup.findAll('a', {'class':'result-dl'})
+                #print(len(table))
+                #resultats = []
+                #for ligne in table :
+                #    resultats.append(ligne.get('href'))
+                #    print(ligne.string)
+                
+                #Version 3
+                resultats = [[],[]]
+                nbreResultat = 1
+                table = soup.find('table')
+                tr_s = table.find_all('tr')
+                for tr in tr_s:
+                    td_s = tr.find_all('td')
+                    element = 1
+                    for data in td_s:
+                        info = data.string
+                        if info:
+                            print(info) # DEBUG
+                            #BUG#resultats[nbreResultat][element] = info
+                            element += 1
+                    nbreResultat += 1
+                    
+                
         except:
                 print("searchAndPaste : erreur parser")
      
