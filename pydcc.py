@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf8 -*-
 #
 # PYDCC main program - User Interface
 #
@@ -23,9 +24,10 @@ if choix == 1 :
                 print("erreur input recherche")
         try:
                 resultats = search.searchAndParse(query)
-                print(resultats)
         except:
                 print("erreur searchAndParse")
+        for ligne in resultats:
+            print(ligne)
 else:
         print(choix)
 
