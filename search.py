@@ -53,11 +53,16 @@ def searchAndParse(requete, url=CONFIG.url):
                 table = soup.find('table')
                 tr_s = table.find_all('tr')
                 for tr in tr_s:
+                    #print(tr,"\n\n") ## DEBUG
                     td_s = tr.find_all('td')
+                    #print(td_s,"\n\n\n---------------") #DEBUG
                     resultats.append([])
                     for data in td_s:
                         try:
-                            info = data.string
+                            #print(data,"\n\n") #DEBUG
+                            #info = data.string
+                            info = data.get_text()
+                            #print(info,"\n\n\n------") #DEBUG
                             if info:
                                 resultats[nbreResultat].append(info)
                         except:
