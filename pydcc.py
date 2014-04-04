@@ -7,10 +7,11 @@
 
 import config as CONFIG
 import search
+import bot
         
 print("Pydcc")
 print(" 1 : Rechercher")
-print(" 2 : Voir le DL en cours")
+print(" 2 : lancer le bot sur #barakuun")
 try:
         choix = input("Quel est votre choix?\n")
         choix = int(choix)
@@ -28,6 +29,10 @@ if choix == 1 :
                 print("erreur searchAndParse")
         for ligne in resultats:
             print(ligne)
+            
+elif choix == 2 :
+    bot = bot.Grabator();
+    bot.start()
 else:
         print(choix)
 
