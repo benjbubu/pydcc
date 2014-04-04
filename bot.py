@@ -17,6 +17,7 @@ class Grabator(irc.bot.SingleServerIRCBot):
 
     def on_welcome(self, c, e):
         c.join(self.channel)
+        self.connection.buffer.errors = 'replace'
         # DEBUG : se connecter à un autre channel en parallèle :)
         c.join("#barakuun2")
 
