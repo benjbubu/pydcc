@@ -35,17 +35,12 @@ class Grabator(irc.bot.SingleServerIRCBot):
 
     def on_privmsg(self, c, e):
         pass
-        #self.do_command(e, e.arguments[0])
+        self.do_command(e, e.arguments[0])
         
     def on_pubmsg(self, c, e):
         pass
-        # a = e.arguments[0].split(":", 1)
-        # if len(a) > 1 and irc.strings.lower(a[0]) == irc.strings.lower(self.connection.get_nickname()):
-            # self.do_command(e, a[1].strip())
-        # return
 
     def on_dccmsg(self, connection, event):
-        #c.privmsg("You said: " + e.arguments[0])
         data = event.arguments[0]
         self.file.write(data)
         self.received_bytes = self.received_bytes + len(data)
@@ -53,50 +48,28 @@ class Grabator(irc.bot.SingleServerIRCBot):
 
     def on_dccchat(self, c, e):
         pass
-        # if len(e.arguments) != 2:
-            # return
-        # args = e.arguments[1].split()
-        # if len(args) == 4:
-            # try:
-                # address = ip_numstr_to_quad(args[2])
-                # port = int(args[3])
-            # except ValueError:
-                # return
-            # self.dcc_connect(address, port)
 
     def do_command(self, e, cmd):
         pass
-        #nick = e.source.nick
-        # c = self.connection
-
-        # if cmd == "disconnect":
-            # self.disconnect()
-        # elif cmd == "die":
-            # self.die()
-        # elif cmd == "stats":
-            # for chname, chobj in self.channels.items():
-                # c.notice(nick, "--- Channel statistics ---")
-                # c.notice(nick, "Channel: " + chname)
-                # users = chobj.users()
-                # users.sort()
-                # c.notice(nick, "Users: " + ", ".join(users))
-                # opers = chobj.opers()
-                # opers.sort()
-                # c.notice(nick, "Opers: " + ", ".join(opers))
-                # voiced = chobj.voiced()
-                # voiced.sort()
-                # c.notice(nick, "Voiced: " + ", ".join(voiced))
-        # elif cmd == "dcc":
-            # dcc = self.dcc_listen()
-            # c.ctcp("DCC", nick, "CHAT chat %s %d" % (
-                # ip_quad_to_numstr(dcc.localaddress),
-                # dcc.localport))
-        # elif cmd == "transferator":
-            # c.notice(nick, "je vais démarrer le transfert avec transferator")
-            # c.notice("Transferator", "xdcc send #11")
-        # else:
-            # c.notice(nick, "Not understood: " + cmd)
-         
+        nick = e.source.nick
+        self.monMaitre = nick
+        c = self.connection
+        cmdListe = cmd.split()
+        
+        if cmdListe[0] == "disconnect":
+            self.disconnect()
+        elif cmdListe[0] == "die":
+            self.die()
+        elif cmdListe[0] == "transferator":
+            c.notice(nick, "je vais démarrer le transfert avec transferator "+cmdListe[1])
+            c.notice("Transferator", "xdcc send "+cmdListe[1])
+        else:
+            c.notice(nick, "Not understood: " + cmd)
+            c.notice(nick, "pydcc usage :")
+            c.notice(nick, "  /msg pydcc disconnect")
+            c.notice(nick, "  /msg pydcc die")
+            c.notice(nick, "  /msg pydcc transferator #XX")
+        
     def on_ctcp(self, connection, event):
         args = event.arguments[1].split()
         if args[0] != "SEND":
