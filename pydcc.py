@@ -27,12 +27,17 @@ if choix == 1 :
                 resultats = search.searchAndParse(query)
         except:
                 print("erreur searchAndParse")
+        a = 0
         for ligne in resultats:
-            print(ligne)
-            
-elif choix == 2 :
-    bot = bot.Grabator();
-    bot.start()
+                if ligne == []:
+                     print(" ")
+                else:
+                     print(a, ligne)
+                     a = a + 1
 else:
         print(choix)
+selection = input("Choisissez votre paquet \n")
+selection = int(selection)
+print(resultats[selection])
+
 
