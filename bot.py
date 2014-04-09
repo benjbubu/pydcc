@@ -2,32 +2,34 @@
 # -*- coding: utf8 -*-
 
 ## POUR DCCRECEIVE ?
-from __future__ import print_function
-
+#from __future__ import print_function
 import os
 import struct
-#import sys
-#import argparse
-#import irc.client
-#import irc.logging
-
 import irc.bot
 import irc.strings
 #from irc.client import ip_numstr_to_quad, ip_quad_to_numstr
-#import config as CONFIG
-
+from config import *
 import time
+import re
 
 class Grabator(irc.bot.SingleServerIRCBot):
+    """
+        class Grabator
+        
+        définit un bot qui se connecte à un serveur irc et est capable de télécharger des paquets en xdcc
+        Il peut scanner le topic du channel principal ainsi que les messages privés afin de se connecter aux salons et channels de chat
+    
+    """
     def __init__(
             self, 
-            channel="#barakuun", 
-            nickname="Pydcc", 
-            server="irc.kottnet.net", 
-            numPaquet=0, 
-            nomRobot="Paul", 
-            secondChannel="#barakuun2",
-            port=6667,):
+            channel = ircDefaultChannel, 
+            nickname = ircDefaultNickname, 
+            server = ircDefaultServer, 
+            numPaquet = ircDefaultNumPaquet, 
+            nomRobot = ircDefaultNomRobot, 
+            secondChannel = ircDefaultSecondChannel,
+            port = ircDefaultPort
+            ):
         print("channel =", channel, "; nickname =", nickname, "; server = ", server, port) #DEBUG
         try:
             irc.bot.SingleServerIRCBot.__init__(self, [(server, port)], nickname, nickname)
@@ -38,30 +40,50 @@ class Grabator(irc.bot.SingleServerIRCBot):
         self.nomRobot = nomRobot
         self.secondChannel = secondChannel
         self.received_bytes = 0
-        self.ctcp_version = "HexChat 2.9.5"
+        self.ctcp_version = ircDefaultVersion
+        # Pour gérer les encodages :
+        self.connection.buffer_class.encoding = 'utf-8'# self.connection.buffer_class. = irc.buffer.LineBuffer
+        
     
     def on_nicknameinuse(self, c, event):
         c.nick(c.get_nickname() + "_")
 
     def on_welcome(self, c, event):
         c.join(self.channel)
+        
+        # pour gérer les problème d'encodage
         self.connection.buffer.errors = 'replace'
         
-        c.join(self.secondChannel)  
+        if (self.secondChannel != ""):
+            print("connexion au secondChannel :", self.secondChannel)
+            c.join(self.secondChannel)
         
-        time.sleep(5.2)
+        # tempo et commande pour téléchargement
+        time.sleep(ircTempoAvantDL)
+        print("commande XDCC SEND #" + str(self.numPaquet) )
         c.notice(self.nomRobot, "xdcc send #" + str(self.numPaquet) )
-        
 
     def on_privmsg(self, connection, event):
         #DEBUG
-        print(event.arguments)
+        print("priv --", event.arguments)
+        msgPriv = self.filtrerCouleur(event.arguments[0])
+        secondChannel = self.extraireChannel(msgPriv)
+        if ( secondChannel is not None ) :
+            if (secondChannel != self.channel):
+                self.secondChannel = secondChannel
+                print( "connexion au second channel : ", self.secondChannel)
+                connection.join(self.secondChannel)
+        else:
+            print( "Pas de channel dans le message privé")
         
     def on_pubmsg(self, cconnection, event):
         pass
+        #DEBUG
+        #print("pub ---", event.arguments)
 
     def on_dccmsg(self, connection, event):
-        #c.privmsg("You said: " + e.arguments[0])
+        #DEBUG
+        #print("dccmsg --", event.arguments)
         
         data = event.arguments[0]
         self.file.write(data)
@@ -71,22 +93,26 @@ class Grabator(irc.bot.SingleServerIRCBot):
     def on_dccchat(self, connection, event):
         pass
 
-
     def do_command(self, event, cmd):
         pass
 
     def on_ctcp(self, connection, event):
-    
         #DEBUG
-        print(event.arguments)
+        print("on_ctcp --", event.arguments)
         
-        # le handler par défaut
         nick = event.source.nick
+        # Repondre à :
+        
+        # VERSION
         if event.arguments[0] == "VERSION":
             connection.ctcp_reply(nick, "VERSION " + self.ctcp_version)
+            
+        # PING
         elif event.arguments[0] == "PING":
             if len(event.arguments) > 1:
                 connection.ctcp_reply(nick, "PING " + event.arguments[1])
+                
+        # SEND => TELECHARGER
         elif len(event.arguments) >= 2:       
             args = event.arguments[1].split()
             if args[0] != "SEND":
@@ -107,8 +133,33 @@ class Grabator(irc.bot.SingleServerIRCBot):
         self.file.close()
         print("Received file %s (%d bytes)." % (self.filename,
                                                 self.received_bytes))
-        self.connection.quit()
+        print("Maintenant, je vais me coucher, ciao")
+        self.die()
 
+    def on_currenttopic(self, connection, event):
+        topic = self.filtrerCouleur(event.arguments[1])
+        secondChannel = self.extraireChannel(topic)
+        if ( secondChannel is not None ) :
+            if (secondChannel != self.channel):
+                self.secondChannel = secondChannel
+                print( "connexion au second channel : ", self.secondChannel)
+                connection.join(self.secondChannel)
+        else:
+            print( "Pas de channel dans le topic")
+    
+    def filtrerCouleur(self, string):
+        return re.sub(
+            '(\\03..\,.)|(\\x03[0-9][0-9])|(\\x03[0-9])|(\\x03)|(\\x1f)|(\\x02)',
+            '',
+            string)
+    
+    def extraireChannel(self, string) :
+        channel = re.findall('\#\S*',string)
+        if (channel == [] ):
+            return None
+        else :
+            return channel[0] 
+            
 
 if __name__ == "__main__":
     print("bot.py - fonction test")

@@ -8,12 +8,19 @@
 # this project are here
 #
 
-# IRC server
-ircServerName = "REPLACE_ME"
-ircPort = 6667
-ircNickName = "REPLACE_ME"
-ircUserName = "REPLACE_ME"
-ircChannel = "REPLACE_ME"
+# IRC bot
+ircDefaultChannel = "#barakuun"
+ircDefaultNickname = "Gunther"
+ircDefaultServer = "irc.kottnet.net"
+ircDefaultNumPaquet = 11
+ircDefaultNomRobot = "Transferator"
+ircDefaultSecondChannel = ""
+ircDefaultPort = 6667
+ircDefaultVersion = "HexChat 2.9.5"
+ircTempoAvantDL = 5.2
 
 # Search parameters
-url = "http://ixirc.com/?q=%s"
+defaultUrl = "http://ixirc.com/?q="
+
+# Downloads
+downloadPath = ""
