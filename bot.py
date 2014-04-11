@@ -119,7 +119,7 @@ class Grabator(irc.bot.SingleServerIRCBot):
                 print("bot.py : error : dcc command incomprise")
                 return
             elif args[0] == "SEND":
-                self.filename = os.path.basename(args[1])
+                self.filename = downloadPath + os.path.basename(args[1])
                 if os.path.exists(self.filename):
                     print("A file named", self.filename,)
                     print("already exists. Refusing to save it.")
