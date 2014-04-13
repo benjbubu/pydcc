@@ -89,8 +89,8 @@ try:
         # VISU DES DL EN COURS
         elif choix == 2 :
             for DL in DLPool:
-                print(DL.nomFichier, DL.status, DL.avancement, "% :", DL.dejaTelechargeEnMo, "/", DL.tailleEnOctets*1048576) #1024*1024
-
+                print("{} : {} - {:.1f}% : {:.1f} Mo / {:.1f} Mo".format(DL.nomFichier, DL.status, DL.avancement, DL.dejaTelechargeEnMo, DL.tailleEnOctets/1048576) ) #1024*1024
+                
             # ANCIENNES SOLUTIONS :    
             # while botPool[0].isAlive() :
                 # print("x =",search.x/1000000, "Mo")

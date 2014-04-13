@@ -108,7 +108,7 @@ class Grabator(irc.bot.SingleServerIRCBot):
         
         # synchro des infos avec le programme principal
         self.objetDL.dejaTelechargeEnMo = self.received_bytes/1048576 # 1024*1024
-        self.objetDL.avancement = self.received_bytes/self.objetDL.tailleEnOctets
+        self.objetDL.avancement = self.received_bytes/self.objetDL.tailleEnOctets*100
         
         self.dcc.send_bytes(struct.pack("!I", self.received_bytes))
 
