@@ -9,19 +9,34 @@ import irc.bot
 import irc.strings
 #from irc.client import ip_numstr_to_quad, ip_quad_to_numstr
 from config import *
-import time
 import re
+import random
 
+
+def download(connection, nomRobot, numPaquet):
+    print("commande XDCC SEND #" + str(numPaquet) )
+    connection.notice(nomRobot, "xdcc send #" + str(numPaquet) )
+
+def checkTerminated(bot, DL):
+    if DL.terminated == True :
+        bot.die()
+
+################################################################################
+# CLASS Grabator
+################################################################################    
 class Grabator(irc.bot.SingleServerIRCBot):
     """
         class Grabator
         
-        définit un bot qui se connecte à un serveur irc et est capable de télécharger des paquets en xdcc
-        Il peut scanner le topic du channel principal ainsi que les messages privés afin de se connecter aux salons et channels de chat
+        définit un bot qui se connecte à un serveur irc et est capable de 
+        télécharger des paquets en xdcc.
+        Il peut scanner le topic du channel principal ainsi que les messages
+        privés afin de se connecter aux salons et channels de chat.
     
     """
     def __init__(
             self, 
+            objetDL,
             channel = ircDefaultChannel, 
             nickname = ircDefaultNickname, 
             server = ircDefaultServer, 
@@ -35,6 +50,7 @@ class Grabator(irc.bot.SingleServerIRCBot):
             irc.bot.SingleServerIRCBot.__init__(self, [(server, port)], nickname, nickname)
         except:
             print("bot.py : pb création bot/connexion server")
+        self.objetDL = objetDL
         self.channel = channel
         self.numPaquet = numPaquet
         self.nomRobot = nomRobot
@@ -44,25 +60,26 @@ class Grabator(irc.bot.SingleServerIRCBot):
         # Pour gérer les encodages :
         self.connection.buffer_class.encoding = 'utf-8'# self.connection.buffer_class. = irc.buffer.LineBuffer
         
+        self.connection.execute_every(0.5, checkTerminated, (self, self.objetDL ) )
+        
+    #def __del__(self):
     
     def on_nicknameinuse(self, c, event):
         c.nick(c.get_nickname() + "_")
-
-    def on_welcome(self, c, event):
-        c.join(self.channel)
+        
+    def on_welcome(self, connection, event):
+        connection.join(self.channel)
         
         # pour gérer les problème d'encodage
         self.connection.buffer.errors = 'replace'
         
         if (self.secondChannel != ""):
             print("connexion au secondChannel :", self.secondChannel)
-            c.join(self.secondChannel)
+            connection.join(self.secondChannel)
         
         # tempo et commande pour téléchargement
-        time.sleep(ircTempoAvantDL)
-        print("commande XDCC SEND #" + str(self.numPaquet) )
-        c.notice(self.nomRobot, "xdcc send #" + str(self.numPaquet) )
-
+        connection.execute_delayed(random.uniform(2,8), download, (connection, self.nomRobot, self.numPaquet) )
+    
     def on_privmsg(self, connection, event):
         #DEBUG
         print("priv --", event.arguments)
@@ -88,6 +105,11 @@ class Grabator(irc.bot.SingleServerIRCBot):
         data = event.arguments[0]
         self.file.write(data)
         self.received_bytes = self.received_bytes + len(data)
+        
+        # synchro des infos avec le programme principal
+        self.objetDL.dejaTelechargeEnMo = self.received_bytes/1048576 # 1024*1024
+        self.objetDL.avancement = self.received_bytes/self.objetDL.tailleEnOctets
+        
         self.dcc.send_bytes(struct.pack("!I", self.received_bytes))
 
     def on_dccchat(self, connection, event):
@@ -123,7 +145,11 @@ class Grabator(irc.bot.SingleServerIRCBot):
                 if os.path.exists(self.filename):
                     print("A file named", self.filename,)
                     print("already exists. Refusing to save it.")
-                    self.connection.quit()
+                    #self.connection.quit()
+                    self.die()
+                # récupération de la taille en Octets du fichier
+                self.objetDL.tailleEnOctets = int(args[4])
+                # 
                 self.file = open(self.filename, "wb")
                 peeraddress = irc.client.ip_numstr_to_quad(args[2])
                 peerport = int(args[3])
@@ -134,6 +160,8 @@ class Grabator(irc.bot.SingleServerIRCBot):
         print("Received file %s (%d bytes)." % (self.filename,
                                                 self.received_bytes))
         print("Maintenant, je vais me coucher, ciao")
+        self.objetDL.status = "fini"
+        self.objetDL.avancement = 100
         self.die()
 
     def on_currenttopic(self, connection, event):
@@ -160,7 +188,57 @@ class Grabator(irc.bot.SingleServerIRCBot):
         else :
             return channel[0] 
             
+            
 
+################################################################################
+# CLASS botFactory
+################################################################################    
+class Download :
+    def __init__(
+            self,
+            server = ircDefaultServer,
+            channel = ircDefaultChannel,
+            nomRobot = ircDefaultNomRobot,
+            numPaquet = ircDefaultNumPaquet,
+            nickname  =ircDefaultNickname,
+            nomFichier = "Pas de nom défini",
+            secondChannel = ircDefaultSecondChannel,
+            port = ircDefaultPort
+            ):
+        self.server = "irc." + server + ".net"
+        self.channel = channel
+        self.nomRobot = nomRobot
+        self.numPaquet = numPaquet
+        self.nickname = nickname
+        self.secondChannel = secondChannel
+        self.nomFichier = nomFichier
+        self.port = port
+        
+        # et pour le partage d'infos :
+        self.terminated = False       
+        self.dejaTelechargeEnMo = 0
+        self.tailleEnOctets = 1048576
+        self.status = "pas commencé"
+        self.avancement = 0
+        
+    def startDL(self):
+        self.status = "en cours"
+        self.pydccBot = Grabator(
+            self,
+            self.channel,
+            self.nickname, 
+            self.server,
+            self.numPaquet,
+            self.nomRobot,
+            self.secondChannel,
+            self.port
+            )
+        self.pydccBot.start()
+
+        
+        
+            
+# TEST DE LA CLASSE GRABATOR, UN XDCC_BOT
 if __name__ == "__main__":
     print("bot.py - fonction test")
     bot = Grabator()

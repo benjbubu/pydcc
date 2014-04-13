@@ -7,7 +7,8 @@
 import urllib.request
 from config import *
 from bs4 import BeautifulSoup
-        
+
+
 def searchAndParse(requete, url = defaultUrl):
     """
         searchAndParse(requete, url=CONFIG.url)

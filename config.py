@@ -11,8 +11,8 @@
 # IRC bot
 ircDefaultChannel = "#barakuun"
 ircDefaultNickname = "Gunther"
-ircDefaultServer = "irc.kottnet.net"
-ircDefaultNumPaquet = 11
+ircDefaultServer = "kottnet"
+ircDefaultNumPaquet = 14
 ircDefaultNomRobot = "Transferator"
 ircDefaultSecondChannel = ""
 ircDefaultPort = 6667
