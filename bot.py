@@ -57,6 +57,7 @@ class Grabator(irc.bot.SingleServerIRCBot):
         self.secondChannel = secondChannel
         self.received_bytes = 0
         self.ctcp_version = ircDefaultVersion
+        self.repriseDL = False
         # Pour gérer les encodages :
         self.connection.buffer_class.encoding = 'utf-8'# self.connection.buffer_class. = irc.buffer.LineBuffer
         
@@ -137,10 +138,7 @@ class Grabator(irc.bot.SingleServerIRCBot):
         # SEND => TELECHARGER
         elif len(event.arguments) >= 2:       
             args = event.arguments[1].split()
-            if args[0] != "SEND":
-                print("bot.py : error : dcc command incomprise")
-                return
-            elif args[0] == "SEND":
+            if args[0] == "SEND":
                 self.filename = downloadPath + os.path.basename(args[1])
                 if os.path.exists(self.filename):
                     print("A file named", self.filename,)
@@ -148,10 +146,16 @@ class Grabator(irc.bot.SingleServerIRCBot):
                     #self.connection.quit()
                     #self.die()
                     self.objetDL.tailleEnOctets = int(args[4])
-                    self.file = open(self.filename, "ab")
-                    peeraddress = irc.client.ip_numstr_to_quad(args[2])
-                    peerport = int(args[3])
-                    self.dcc = self.dcc_connect(peeraddress, peerport, "raw")
+                    self.peeraddress = irc.client.ip_numstr_to_quad(args[2])
+                    position = os.path.getsize(self.filename)
+                    #print("commande XDCC RESUME  position=" + str(position) )
+                    cmd = "DCC RESUME #"+ str(self.numPaquet) +" "+ str(args[3]) +" "+ str(position)
+                    print(cmd)
+                    connection.ctcp_reply(self.nomRobot, cmd  )
+                    # self.file = open(self.filename, "ab")
+                    # peeraddress = irc.client.ip_numstr_to_quad(args[2])
+                    # peerport = int(args[3])
+                    # self.dcc = self.dcc_connect(peeraddress, peerport, "raw")
                 else:
                     print("Pas de fichier existant. Debut du DL")                    
                     # récupération de la taille en Octets du fichier
@@ -161,6 +165,14 @@ class Grabator(irc.bot.SingleServerIRCBot):
                     peeraddress = irc.client.ip_numstr_to_quad(args[2])
                     peerport = int(args[3])
                     self.dcc = self.dcc_connect(peeraddress, peerport, "raw")
+            elif args[0] == "ACCEPT" :
+                print("on_ctcp RESUME")
+                self.file = open(self.filename, "ab")
+                peerport = int(args[2])
+                self.dcc = self.dcc_connect(self.peeraddress, peerport, "raw")
+            else:
+                print("bot.py : error : dcc command incomprise")
+                self.die()
           
     def on_dcc_disconnect(self, connection, event):
         self.file.close()
