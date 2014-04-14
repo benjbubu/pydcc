@@ -144,16 +144,23 @@ class Grabator(irc.bot.SingleServerIRCBot):
                 self.filename = downloadPath + os.path.basename(args[1])
                 if os.path.exists(self.filename):
                     print("A file named", self.filename,)
-                    print("already exists. Refusing to save it.")
+                    print("already exists. Attempting to resume it.")
                     #self.connection.quit()
-                    self.die()
-                # récupération de la taille en Octets du fichier
-                self.objetDL.tailleEnOctets = int(args[4])
-                # 
-                self.file = open(self.filename, "wb")
-                peeraddress = irc.client.ip_numstr_to_quad(args[2])
-                peerport = int(args[3])
-                self.dcc = self.dcc_connect(peeraddress, peerport, "raw")
+                    #self.die()
+                    self.objetDL.tailleEnOctets = int(args[4])
+                    self.file = open(self.filename, "ab")
+                    peeraddress = irc.client.ip_numstr_to_quad(args[2])
+                    peerport = int(args[3])
+                    self.dcc = self.dcc_connect(peeraddress, peerport, "raw")
+                else:
+                    print("Pas de fichier existant. Debut du DL")                    
+                    # récupération de la taille en Octets du fichier
+                    self.objetDL.tailleEnOctets = int(args[4])
+                    # 
+                    self.file = open(self.filename, "wb")
+                    peeraddress = irc.client.ip_numstr_to_quad(args[2])
+                    peerport = int(args[3])
+                    self.dcc = self.dcc_connect(peeraddress, peerport, "raw")
           
     def on_dcc_disconnect(self, connection, event):
         self.file.close()
