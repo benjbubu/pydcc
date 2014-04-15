@@ -10,7 +10,7 @@
 
 # IRC bot
 ircDefaultChannel = "#barakuun"
-ircDefaultNickname = "LovingCarmy"
+ircDefaultNickname = "LovingCarmyKissKiss"
 ircDefaultServer = "kottnet"
 ircDefaultNumPaquet = 1
 ircDefaultNomRobot = "Transferator"

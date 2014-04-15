@@ -58,13 +58,12 @@ class Grabator(irc.bot.SingleServerIRCBot):
         self.received_bytes = 0
         self.ctcp_version = ircDefaultVersion
         self.repriseDL = False
+        self.position = 0
         # Pour gérer les encodages :
         self.connection.buffer_class.encoding = 'utf-8'# self.connection.buffer_class. = irc.buffer.LineBuffer
-        
+        # Execution retardée de l'envoi de la commande SEND (permettre connexion au second channel)
         self.connection.execute_every(0.5, checkTerminated, (self, self.objetDL ) )
         
-    #def __del__(self):
-    
     def on_nicknameinuse(self, c, event):
         c.nick(c.get_nickname() + "_")
         
@@ -103,15 +102,17 @@ class Grabator(irc.bot.SingleServerIRCBot):
         #DEBUG
         #print("dccmsg --", event.arguments)
         
+        # Enregistrement dans le fichier des données reçues
         data = event.arguments[0]
         self.file.write(data)
         self.received_bytes = self.received_bytes + len(data)
         
         # synchro des infos avec le programme principal
-        self.objetDL.dejaTelechargeEnMo = self.received_bytes/1048576 # 1024*1024
-        self.objetDL.avancement = self.received_bytes/self.objetDL.tailleEnOctets*100
+        self.objetDL.dejaTelechargeEnMo = (self.position + self.received_bytes)/1048576 # 1024*1024
+        self.objetDL.avancement = (self.position + self.received_bytes)/self.objetDL.tailleEnOctets*100
         
-        self.dcc.send_bytes(struct.pack("!I", self.received_bytes))
+        # Ack command ? part of DCC protocol ?
+        self.dcc.send_bytes(struct.pack("!I", self.received_bytes + self.position))
 
     def on_dccchat(self, connection, event):
         pass
@@ -123,54 +124,59 @@ class Grabator(irc.bot.SingleServerIRCBot):
         #DEBUG
         print("on_ctcp --", event.arguments)
         
+        # Usefull info 
         nick = event.source.nick
-        # Repondre à :
         
-        # VERSION
+        # CTCP ANSWER TO : VERSION
         if event.arguments[0] == "VERSION":
             connection.ctcp_reply(nick, "VERSION " + self.ctcp_version)
             
-        # PING
+        # CTCP ANSWER TO : PING
         elif event.arguments[0] == "PING":
             if len(event.arguments) > 1:
                 connection.ctcp_reply(nick, "PING " + event.arguments[1])
                 
-        # SEND => TELECHARGER
+        # CTCP ANSWER TO : SEND => TELECHARGER
         elif len(event.arguments) >= 2:       
             args = event.arguments[1].split()
             if args[0] == "SEND":
                 self.filename = downloadPath + os.path.basename(args[1])
                 if os.path.exists(self.filename):
+                    #DEBUG INFO :
                     print("A file named", self.filename,)
                     print("already exists. Attempting to resume it.")
-                    #self.connection.quit()
-                    #self.die()
+                    
+                    # Récupère infos utiles
                     self.objetDL.tailleEnOctets = int(args[4])
                     self.peeraddress = irc.client.ip_numstr_to_quad(args[2])
-                    position = os.path.getsize(self.filename)
-                    #print("commande XDCC RESUME  position=" + str(position) )
-                    cmd = "DCC RESUME #"+ str(self.numPaquet) +" "+ str(args[3]) +" "+ str(position)
-                    print(cmd)
-                    connection.ctcp_reply(self.nomRobot, cmd  )
-                    # self.file = open(self.filename, "ab")
-                    # peeraddress = irc.client.ip_numstr_to_quad(args[2])
-                    # peerport = int(args[3])
-                    # self.dcc = self.dcc_connect(peeraddress, peerport, "raw")
+                    self.position = os.path.getsize(self.filename)
+                    
+                    # envoi commande resume
+                    cmd = "DCC RESUME #"+ str(self.numPaquet) +" "+ str(args[3]) +" "+ str(self.position)
+                    connection.ctcp_reply(self.nomRobot, cmd )
+                    
                 else:
-                    print("Pas de fichier existant. Debut du DL")                    
+                    # DEBUG INFO :
+                    print("Pas de fichier existant. Debut du DL")    
+                    
                     # récupération de la taille en Octets du fichier
                     self.objetDL.tailleEnOctets = int(args[4])
-                    # 
+                    
+                    # création du fichier et connection DCC
                     self.file = open(self.filename, "wb")
                     peeraddress = irc.client.ip_numstr_to_quad(args[2])
                     peerport = int(args[3])
                     self.dcc = self.dcc_connect(peeraddress, peerport, "raw")
+                    
             elif args[0] == "ACCEPT" :
+                # ouverture du fichier
                 print("on_ctcp RESUME")
                 self.file = open(self.filename, "ab")
                 peerport = int(args[2])
                 self.dcc = self.dcc_connect(self.peeraddress, peerport, "raw")
+                
             else:
+                # Error : (raising exception needed ?)
                 print("bot.py : error : dcc command incomprise")
                 self.die()
           
@@ -210,7 +216,7 @@ class Grabator(irc.bot.SingleServerIRCBot):
             
 
 ################################################################################
-# CLASS botFactory
+# CLASS Download
 ################################################################################    
 class Download :
     def __init__(
