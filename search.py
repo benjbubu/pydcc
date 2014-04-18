@@ -62,6 +62,11 @@ def searchAndParse(requete, url = defaultUrl):
             nbreResultat += 1
     except:
             print("searchAndPaste : erreur parser BeautifulSoup")
- 
+
+    # enlever les lignes vides
+    for ligne in resultats:
+        if ligne == [] :
+            resultats.remove(ligne)
+    
     return resultats
         
