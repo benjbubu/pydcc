@@ -230,7 +230,10 @@ class Download :
             secondChannel = ircDefaultSecondChannel,
             port = ircDefaultPort
             ):
-        self.server = "irc." + server + ".net"
+        if server == "barakuun":
+            self.server = "barakuun.com"
+        else:
+            self.server = "irc." + server + ".net"
         self.channel = channel
         self.nomRobot = nomRobot
         self.numPaquet = numPaquet
