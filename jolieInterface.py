@@ -6,12 +6,22 @@ import search
 import bot
 import threading
 from config import *
+import time
+
+tableauCadreAvancement = []
 
 class jolieInterface(Frame):
 
-    def __init__(self, fenetre, **kwargs):
+    def __init__(self, fenetre, oSynchro, **kwargs):
         Frame.__init__(self, fenetre, width=768, height=576, **kwargs)
         self.pack(fill=BOTH)
+        self.fenetre = fenetre
+                
+        ##############################
+        # pour la gestion des bots irc
+        ##############################
+        self.DLPool = []
+        
         
         ############################################
         # un cadre rien que pour le titre de l'appli
@@ -41,28 +51,36 @@ class jolieInterface(Frame):
         ######################################
         # un cadre pour afficher les resultats
         ######################################
+        self.resultatsCadreMain = Frame(self)
+        self.resultatsCadreMain.pack(fill=BOTH)
         self.construireCadreResultat()
         
         #####################################
         # un cadre pour effectuer des actions
         #####################################
-        # construit après les résultats pour soigner la mise en forme :)
-        
-        #
-        # pour la gestion des bots irc
-        #
-        self.DLPool = []
-
-        
-    def construireCadreActions(self):
         self.actions = Frame(self)
         self.actions.pack(fill=BOTH)
         # juste un bouton pour lancer le DL des cases cochées
         boutonTelecharger = Button(self.actions, text="Télécharger les cases cochées", command=self.telecharger)
         boutonTelecharger.pack(side="left", fill=BOTH)
+
+        #####################################
+        # un cadre pour voir avancement
+        #####################################
+        self.avancement = Frame(self)
+        self.avancement.pack(fill=BOTH)
+        self.threadAvancement = threading.Thread(None, refreshAvancement, None, (self.DLPool,oSynchro))
+        self.threadAvancement.start()
+        
+        
+    def getThreadAvancement(self):
+        #stop = True
+        #time.sleep(0.5)
+        return self.threadAvancement
+        
         
     def construireCadreResultat(self):
-        self.resultatsCadre = Frame(self)
+        self.resultatsCadre = Frame(self.resultatsCadreMain)
         self.resultatsCadre.pack(fill=BOTH)
         # des cadres pour mettre en forme les résultats (tableau ...)
         self.resultatsCadresTable = []
@@ -80,12 +98,6 @@ class jolieInterface(Frame):
         LabelChannel = Label(self.resultatsCadresTable[4], text="Channel")
         LabelChannel.pack(fill=X)
         
-        try:
-            self.actions.destroy()
-        except:
-            pass
-        finally:
-            self.construireCadreActions()
 
     
     def rechercher(self):
@@ -138,3 +150,24 @@ class jolieInterface(Frame):
                 self.DLPool.append(nouveauDL)
                 nouveauThread = threading.Thread(None, nouveauDL.startDL, None)
                 nouveauThread.start()
+                tableauCadreAvancement.append(Label(self.avancement, text="..."))
+                tableauCadreAvancement[-1].pack(fill=X)
+        self.aTelecharger = []
+
+def refreshAvancement(DLPool, oSynchro):
+    cadre = None
+    while oSynchro.stop == False:
+        i = 0
+        for DL in DLPool:
+            avancementString = "{} : {} - {:.1f}% : {:.1f} Mo / {:.1f} Mo".format(
+                    DL.nomFichier, DL.status, DL.avancement,
+                    DL.dejaTelechargeEnMo, DL.tailleEnOctets/1048576) #1024*1024
+            tableauCadreAvancement[i]['text'] = avancementString
+            i += 1
+        time.sleep(0.5)
+    print("ok, threadAvancement va se terminer")
+    
+class synchro:
+    def __init__(self):
+        self.stop = False
+        

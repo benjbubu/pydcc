@@ -13,6 +13,11 @@ from tkinter import *
 # On crée une fenêtre, racine de notre interface
 fenetre = Tk()
 
-monIHM = jolieInterface.jolieInterface(fenetre)
+oSynchro = jolieInterface.synchro()
+
+monIHM = jolieInterface.jolieInterface(fenetre, oSynchro)
 
 monIHM.mainloop()
+
+oSynchro.stop = True
+
