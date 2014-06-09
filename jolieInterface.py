@@ -83,21 +83,31 @@ class jolieInterface(Frame):
         self.resultatsCadre = Frame(self.resultatsCadreMain)
         self.resultatsCadre.pack(fill=BOTH)
         # des cadres pour mettre en forme les résultats (tableau ...)
-        self.resultatsCadresTable = []
-        for i in range(0,5):
-            self.resultatsCadresTable.append(Frame(self.resultatsCadre,relief=RAISED, borderwidth=1))
-            self.resultatsCadresTable[i].pack(side=LEFT, fill=BOTH)
-        LabelaCocher = Label(self.resultatsCadresTable[0], text="A Cocher")
-        LabelaCocher.pack(fill=X)
-        LabelNom = Label(self.resultatsCadresTable[1], text="Nom")
-        LabelNom.pack(fill=X)
-        LabelTaille = Label(self.resultatsCadresTable[2], text="Taille")
-        LabelTaille.pack(fill=X)
-        LabelServeur = Label(self.resultatsCadresTable[3], text="Serveur")
-        LabelServeur.pack(fill=X)
-        LabelChannel = Label(self.resultatsCadresTable[4], text="Channel")
-        LabelChannel.pack(fill=X)
+        # self.resultatsCadresTable = []
+        # for i in range(0,5):
+            # self.resultatsCadresTable.append(Frame(self.resultatsCadre,relief=RAISED, borderwidth=1))
+            # self.resultatsCadresTable[i].pack(side=LEFT, fill=BOTH)
+        # LabelaCocher = Label(self.resultatsCadresTable[0], text="A Cocher")
+        # LabelaCocher.pack(fill=X)
+        # LabelNom = Label(self.resultatsCadresTable[1], text="Nom")
+        # LabelNom.pack(fill=X)
+        # LabelTaille = Label(self.resultatsCadresTable[2], text="Taille")
+        # LabelTaille.pack(fill=X)
+        # LabelServeur = Label(self.resultatsCadresTable[3], text="Serveur")
+        # LabelServeur.pack(fill=X)
+        # LabelChannel = Label(self.resultatsCadresTable[4], text="Channel")
+        # LabelChannel.pack(fill=X)
         
+        LabelaCocher = Label(self.resultatsCadre, text="A Cocher", relief=RAISED, borderwidth = 2)
+        LabelaCocher.grid(row=0, column=0,sticky="nsew")
+        LabelNom = Label(self.resultatsCadre, text="Nom", relief=RAISED, borderwidth = 2)
+        LabelNom.grid(row=0, column=1,sticky="nsew")
+        LabelTaille = Label(self.resultatsCadre, text="Taille", relief=RAISED, borderwidth = 2)
+        LabelTaille.grid(row=0, column=2,sticky="nsew")
+        LabelServeur = Label(self.resultatsCadre, text="Serveur", relief=RAISED, borderwidth = 2)
+        LabelServeur.grid(row=0, column=3,sticky="nsew")
+        LabelChannel = Label(self.resultatsCadre, text="Channel", relief=RAISED, borderwidth = 2)
+        LabelChannel.grid(row=0, column=4,sticky="nsew")
 
     
     def rechercher(self):
@@ -114,20 +124,39 @@ class jolieInterface(Frame):
             #print(self.resultats)
         
             for result in self.resultats:
-                frameTemporaire = Frame(self.resultatsCadresTable[1])
-                frameTemporaire.pack(fill=X)
+                # frameTemporaire = Frame(self.resultatsCadresTable[1])
+                # frameTemporaire.pack(fill=X)
+                # self.aTelecharger.append(IntVar())
+                # caseTemporaire = Checkbutton(frameTemporaire,variable=self.aTelecharger[i])
+                # caseTemporaire.pack(side=LEFT, fill=X)
+                # LabelTemporaireTitre = Label(frameTemporaire, text=result[0])
+                # LabelTemporaireTitre.pack(side=LEFT, fill=X)
+                # LabelTemporaireTaille = Label(self.resultatsCadresTable[2], text=result[6])
+                # LabelTemporaireTaille.pack(fill=X)
+                # LabelTemporaireServeur = Label(self.resultatsCadresTable[3], text=result[1])
+                # LabelTemporaireServeur.pack(fill=X)
+                # LabelTemporaireChannel = Label(self.resultatsCadresTable[4], text=result[2])
+                # LabelTemporaireChannel.pack(fill=X)
+                # i += 1
+                
+                if i%2 == 0 :
+                    taille = 0
+                else:
+                    taille = 1
+
                 self.aTelecharger.append(IntVar())
-                caseTemporaire = Checkbutton(frameTemporaire,variable=self.aTelecharger[i])
-                caseTemporaire.pack(side=LEFT, fill=X)
-                LabelTemporaireTitre = Label(frameTemporaire, text=result[0])
-                LabelTemporaireTitre.pack(side=LEFT, fill=X)
-                LabelTemporaireTaille = Label(self.resultatsCadresTable[2], text=result[6])
-                LabelTemporaireTaille.pack(fill=X)
-                LabelTemporaireServeur = Label(self.resultatsCadresTable[3], text=result[1])
-                LabelTemporaireServeur.pack(fill=X)
-                LabelTemporaireChannel = Label(self.resultatsCadresTable[4], text=result[2])
-                LabelTemporaireChannel.pack(fill=X)
+                caseTemporaire = Checkbutton(self.resultatsCadre,variable=self.aTelecharger[i], relief=SUNKEN, borderwidth = taille)
+                caseTemporaire.grid(row=i+1, column=0,sticky="nsew")
+                LabelTemporaireTitre = Label(self.resultatsCadre, text=result[0], relief=SUNKEN, borderwidth = taille)
+                LabelTemporaireTitre.grid(row=i+1, column=1,sticky="nsew")
+                LabelTemporaireTaille = Label(self.resultatsCadre, text=result[6], relief=SUNKEN, borderwidth = taille)
+                LabelTemporaireTaille.grid(row=i+1, column=2,sticky="nsew")
+                LabelTemporaireServeur = Label(self.resultatsCadre, text=result[1], relief=SUNKEN, borderwidth = taille)
+                LabelTemporaireServeur.grid(row=i+1, column=3,sticky="nsew")
+                LabelTemporaireChannel = Label(self.resultatsCadre, text=result[2], relief=SUNKEN, borderwidth = taille)
+                LabelTemporaireChannel.grid(row=i+1, column=4,sticky="nsew")
                 i += 1
+
             
         self.titreAppli["text"] = "action rechercher finie"
         
