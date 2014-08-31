@@ -9,11 +9,11 @@
 #
 
 # IRC bot
-ircDefaultChannel = "#barakuun"
+ircDefaultChannel = "#test"
 ircDefaultNickname = "Gunther"
-ircDefaultServer = "barakuun"
+ircDefaultServer = "irc.freenode.net"
 ircDefaultNumPaquet = 1
-ircDefaultNomRobot = "Transferator"
+ircDefaultNomRobot = "Grabator"
 ircDefaultSecondChannel = ""
 ircDefaultPort = 6667
 ircDefaultVersion = "HexChat 2.9.5"
@@ -23,4 +23,4 @@ ircTempoAvantDL = 5.2
 defaultUrl = "http://ixirc.com/?q="
 
 # Downloads
-downloadPath = ""
+downloadPath = "~/"
