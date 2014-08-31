@@ -27,8 +27,7 @@ try:
         print("Pydcc")
         print(" 1 : Rechercher")
         print(" 2 : voir les dl en cours")
-        print(" 3 : TEST => lancer le bot pour test sur abjects")
-        print(" 4 : TEST => lancer le bot sur #barakuun")
+        print(" 3 : TEST => lancer le bot pour test sur freenode channel test")
         print(" 0 : quitter")
 
         try:
@@ -103,24 +102,9 @@ try:
                     
                 # time.sleep(1)
 
-        
-        # TEST EN "VRAI"
-        elif choix == 3 :
-
-            # Pour tester en "vrai"
-            nouveauDL = bot.Download(
-                "abjects",
-                "#BEAST-XDCC",
-                "Beast-US-026",
-                46,
-                "Georges",
-                )
-            DLPool.append(nouveauDL)
-            nouveauThread = threading.Thread(None, nouveauDL.startDL, None)
-            nouveauThread.start()
             
-        # TEST SUR TRANSFERATOR
-        elif choix == 4 :
+        # TEST SUR IRC.FREENODE.NET CHANNEL TEST
+        elif choix == 3 :
             nouveauDL = bot.Download()
             DLPool.append(nouveauDL)
             nouveauThread = threading.Thread(None, nouveauDL.startDL, None)
