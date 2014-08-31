@@ -230,8 +230,8 @@ class Download :
             secondChannel = ircDefaultSecondChannel,
             port = ircDefaultPort
             ):
-        if server == "barakuun":
-            self.server = "barakuun.com"
+        if server == "freenode":
+            self.server = "irc.freenode.net"
         else:
             self.server = "irc." + server + ".net"
         self.channel = channel
