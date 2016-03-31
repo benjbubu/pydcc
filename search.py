@@ -34,7 +34,8 @@ def searchAndParse(requete, url = defaultUrl):
         #url = (url + "%s") % requete.replace(" ","+")
         query = requete.replace(" ","+")
         url = url + query
-        html = urllib.request.urlopen(url).read()
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        html = urllib.request.urlopen(req).read()
         
         
         try:
